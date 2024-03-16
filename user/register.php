@@ -123,7 +123,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($insertResult->getInsertedCount() > 0) {
         echo "<script>alert('User Registered Successfully!')</script>";
-        echo "<script>window.location.href='index.php';</script>";
+        echo "<script>window.location.href='login.php';</script>";
     } else {
         echo "User registration failed.";
     }
