@@ -99,7 +99,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $address_line = $_POST['add_line'];
     $city = $_POST['city'];
     $mobile_number = $_POST['mobileNo'];
-    $password = $_POST['password'];
+    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
     $security_question = $_POST['secQts'];
     $security_answer = $_POST['secAns'];
 
