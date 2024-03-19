@@ -22,6 +22,7 @@ if (isset($_SESSION["signedin"]) == true) { ?>
 
         <div class="nav">
             <a href="index.php">Home</a>
+            <a href="index.php?playquiz">Play Quiz</a>
             <a href="index.php?contact">Contact Us</a>
             <a href="index.php?userprofile">Welcome <?php echo $_SESSION['userName']; ?></a>
             <a href="logout.php">Logout</a>
@@ -30,6 +31,10 @@ if (isset($_SESSION["signedin"]) == true) { ?>
 
     </html>
 <?php
+    if (isset($_GET['playquiz'])) {
+        include("playquiz.php");
+    }
+
     if (isset($_GET['contact'])) {
         include("contact.php");
     }
@@ -46,11 +51,13 @@ if (isset($_SESSION["signedin"]) == true) { ?>
         include("userprofile.php");
     }
 
-    if (!isset($_GET['contact'])) {
-        if (!isset($_GET['custprofile'])) {
-            if (!isset($_GET['custpasswd'])) {
-                if (!isset($_GET['userprofile'])) {
-                    include('home.php');
+    if (!isset($_GET['playquiz'])) {
+        if (!isset($_GET['contact'])) {
+            if (!isset($_GET['custprofile'])) {
+                if (!isset($_GET['custpasswd'])) {
+                    if (!isset($_GET['userprofile'])) {
+                        include('home.php');
+                    }
                 }
             }
         }
