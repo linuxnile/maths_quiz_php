@@ -1,25 +1,32 @@
 <?php
 
-namespace MongoDB\Tests\Collection;
+namespace MongoDB\Tests\Operation;
 
+use MongoDB\BSON\ObjectId;
 use MongoDB\BulkWriteResult;
+use MongoDB\Collection;
 use MongoDB\Driver\BulkWrite as Bulk;
 use MongoDB\Driver\WriteConcern;
+use MongoDB\Exception\BadMethodCallException;
 use MongoDB\Model\BSONDocument;
 use MongoDB\Operation\BulkWrite;
+use MongoDB\Tests\CommandObserver;
+
+use function version_compare;
 
 class BulkWriteFunctionalTest extends FunctionalTestCase
 {
-    private $omitModifiedCount;
+    /** @var Collection */
+    private $collection;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
-        $this->omitModifiedCount = version_compare($this->getServerVersion(), '2.6.0', '<');
+        $this->collection = new Collection($this->manager, $this->getDatabaseName(), $this->getCollectionName());
     }
 
-    public function testInserts()
+    public function testInserts(): void
     {
         $ops = [
             ['insertOne' => [['_id' => 1, 'x' => 11]]],
@@ -31,12 +38,12 @@ class BulkWriteFunctionalTest extends FunctionalTestCase
         $operation = new BulkWrite($this->getDatabaseName(), $this->getCollectionName(), $ops);
         $result = $operation->execute($this->getPrimaryServer());
 
-        $this->assertInstanceOf('MongoDB\BulkWriteResult', $result);
+        $this->assertInstanceOf(BulkWriteResult::class, $result);
         $this->assertSame(4, $result->getInsertedCount());
 
         $insertedIds = $result->getInsertedIds();
         $this->assertSame(1, $insertedIds[0]);
-        $this->assertInstanceOf('MongoDB\BSON\ObjectId', $insertedIds[1]);
+        $this->assertInstanceOf(ObjectId::class, $insertedIds[1]);
         $this->assertSame('foo', $insertedIds[2]);
         $this->assertSame('bar', $insertedIds[3]);
 
@@ -50,7 +57,7 @@ class BulkWriteFunctionalTest extends FunctionalTestCase
         $this->assertSameDocuments($expected, $this->collection->find());
     }
 
-    public function testUpdates()
+    public function testUpdates(): void
     {
         $this->createFixtures(4);
 
@@ -65,14 +72,14 @@ class BulkWriteFunctionalTest extends FunctionalTestCase
         $operation = new BulkWrite($this->getDatabaseName(), $this->getCollectionName(), $ops);
         $result = $operation->execute($this->getPrimaryServer());
 
-        $this->assertInstanceOf('MongoDB\BulkWriteResult', $result);
+        $this->assertInstanceOf(BulkWriteResult::class, $result);
         $this->assertSame(5, $result->getMatchedCount());
-        $this->omitModifiedCount or $this->assertSame(5, $result->getModifiedCount());
+        $this->assertSame(5, $result->getModifiedCount());
         $this->assertSame(2, $result->getUpsertedCount());
 
         $upsertedIds = $result->getUpsertedIds();
         $this->assertSame(5, $upsertedIds[2]);
-        $this->assertInstanceOf('MongoDB\BSON\ObjectId', $upsertedIds[3]);
+        $this->assertInstanceOf(ObjectId::class, $upsertedIds[3]);
 
         $expected = [
             ['_id' => 1, 'x' => 11],
@@ -86,7 +93,7 @@ class BulkWriteFunctionalTest extends FunctionalTestCase
         $this->assertSameDocuments($expected, $this->collection->find());
     }
 
-    public function testDeletes()
+    public function testDeletes(): void
     {
         $this->createFixtures(4);
 
@@ -98,7 +105,7 @@ class BulkWriteFunctionalTest extends FunctionalTestCase
         $operation = new BulkWrite($this->getDatabaseName(), $this->getCollectionName(), $ops);
         $result = $operation->execute($this->getPrimaryServer());
 
-        $this->assertInstanceOf('MongoDB\BulkWriteResult', $result);
+        $this->assertInstanceOf(BulkWriteResult::class, $result);
         $this->assertSame(3, $result->getDeletedCount());
 
         $expected = [
@@ -108,7 +115,7 @@ class BulkWriteFunctionalTest extends FunctionalTestCase
         $this->assertSameDocuments($expected, $this->collection->find());
     }
 
-    public function testMixedOrderedOperations()
+    public function testMixedOrderedOperations(): void
     {
         $this->createFixtures(3);
 
@@ -123,13 +130,13 @@ class BulkWriteFunctionalTest extends FunctionalTestCase
         $operation = new BulkWrite($this->getDatabaseName(), $this->getCollectionName(), $ops);
         $result = $operation->execute($this->getPrimaryServer());
 
-        $this->assertInstanceOf('MongoDB\BulkWriteResult', $result);
+        $this->assertInstanceOf(BulkWriteResult::class, $result);
 
         $this->assertSame(1, $result->getInsertedCount());
         $this->assertSame([2 => 4], $result->getInsertedIds());
 
         $this->assertSame(3, $result->getMatchedCount());
-        $this->omitModifiedCount or $this->assertSame(3, $result->getModifiedCount());
+        $this->assertSame(3, $result->getModifiedCount());
         $this->assertSame(1, $result->getUpsertedCount());
         $this->assertSame([4 => 4], $result->getUpsertedIds());
 
@@ -158,131 +165,150 @@ class BulkWriteFunctionalTest extends FunctionalTestCase
 
     /**
      * @depends testUnacknowledgedWriteConcern
-     * @expectedException MongoDB\Exception\BadMethodCallException
-     * @expectedExceptionMessageRegExp /[\w:\\]+ should not be called for an unacknowledged write result/
      */
-    public function testUnacknowledgedWriteConcernAccessesDeletedCount(BulkWriteResult $result)
+    public function testUnacknowledgedWriteConcernAccessesDeletedCount(BulkWriteResult $result): void
     {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessageMatches('/[\w:\\\\]+ should not be called for an unacknowledged write result/');
         $result->getDeletedCount();
     }
 
     /**
      * @depends testUnacknowledgedWriteConcern
-     * @expectedException MongoDB\Exception\BadMethodCallException
-     * @expectedExceptionMessageRegExp /[\w:\\]+ should not be called for an unacknowledged write result/
      */
-    public function testUnacknowledgedWriteConcernAccessesInsertCount(BulkWriteResult $result)
+    public function testUnacknowledgedWriteConcernAccessesInsertCount(BulkWriteResult $result): void
     {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessageMatches('/[\w:\\\\]+ should not be called for an unacknowledged write result/');
         $result->getInsertedCount();
     }
 
     /**
      * @depends testUnacknowledgedWriteConcern
-     * @expectedException MongoDB\Exception\BadMethodCallException
-     * @expectedExceptionMessageRegExp /[\w:\\]+ should not be called for an unacknowledged write result/
      */
-    public function testUnacknowledgedWriteConcernAccessesMatchedCount(BulkWriteResult $result)
+    public function testUnacknowledgedWriteConcernAccessesMatchedCount(BulkWriteResult $result): void
     {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessageMatches('/[\w:\\\\]+ should not be called for an unacknowledged write result/');
         $result->getMatchedCount();
     }
 
     /**
      * @depends testUnacknowledgedWriteConcern
-     * @expectedException MongoDB\Exception\BadMethodCallException
-     * @expectedExceptionMessageRegExp /[\w:\\]+ should not be called for an unacknowledged write result/
      */
-    public function testUnacknowledgedWriteConcernAccessesModifiedCount(BulkWriteResult $result)
+    public function testUnacknowledgedWriteConcernAccessesModifiedCount(BulkWriteResult $result): void
     {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessageMatches('/[\w:\\\\]+ should not be called for an unacknowledged write result/');
         $result->getModifiedCount();
     }
 
     /**
      * @depends testUnacknowledgedWriteConcern
-     * @expectedException MongoDB\Exception\BadMethodCallException
-     * @expectedExceptionMessageRegExp /[\w:\\]+ should not be called for an unacknowledged write result/
      */
-    public function testUnacknowledgedWriteConcernAccessesUpsertedCount(BulkWriteResult $result)
+    public function testUnacknowledgedWriteConcernAccessesUpsertedCount(BulkWriteResult $result): void
     {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessageMatches('/[\w:\\\\]+ should not be called for an unacknowledged write result/');
         $result->getUpsertedCount();
     }
 
     /**
      * @depends testUnacknowledgedWriteConcern
-     * @expectedException MongoDB\Exception\BadMethodCallException
-     * @expectedExceptionMessageRegExp /[\w:\\]+ should not be called for an unacknowledged write result/
      */
-    public function testUnacknowledgedWriteConcernAccessesUpsertedIds(BulkWriteResult $result)
+    public function testUnacknowledgedWriteConcernAccessesUpsertedIds(BulkWriteResult $result): void
     {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessageMatches('/[\w:\\\\]+ should not be called for an unacknowledged write result/');
         $result->getUpsertedIds();
     }
 
-    /**
-     * @expectedException MongoDB\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Unknown operation type "foo" in $operations[0]
-     */
-    public function testUnknownOperation()
+    public function testSessionOption(): void
     {
-        new BulkWrite($this->getDatabaseName(), $this->getCollectionName(), [
-            ['foo' => [['_id' => 1]]],
-        ]);
+        (new CommandObserver())->observe(
+            function (): void {
+                $operation = new BulkWrite(
+                    $this->getDatabaseName(),
+                    $this->getCollectionName(),
+                    [['insertOne' => [['_id' => 1]]]],
+                    ['session' => $this->createSession()]
+                );
+
+                $operation->execute($this->getPrimaryServer());
+            },
+            function (array $event): void {
+                $this->assertObjectHasAttribute('lsid', $event['started']->getCommand());
+            }
+        );
     }
 
-    /**
-     * @expectedException MongoDB\Exception\InvalidArgumentException
-     * @expectedExceptionMessageRegExp /Missing (first|second) argument for \$operations\[\d+\]\["\w+\"]/
-     * @dataProvider provideOpsWithMissingArguments
-     */
-    public function testMissingArguments(array $ops)
+    public function testBypassDocumentValidationSetWhenTrue(): void
     {
-        new BulkWrite($this->getDatabaseName(), $this->getCollectionName(), $ops);
+        (new CommandObserver())->observe(
+            function (): void {
+                $operation = new BulkWrite(
+                    $this->getDatabaseName(),
+                    $this->getCollectionName(),
+                    [['insertOne' => [['_id' => 1]]]],
+                    ['bypassDocumentValidation' => true]
+                );
+
+                $operation->execute($this->getPrimaryServer());
+            },
+            function (array $event): void {
+                $this->assertObjectHasAttribute('bypassDocumentValidation', $event['started']->getCommand());
+                $this->assertEquals(true, $event['started']->getCommand()->bypassDocumentValidation);
+            }
+        );
     }
 
-    public function provideOpsWithMissingArguments()
+    public function testBypassDocumentValidationUnsetWhenFalse(): void
     {
-        return [
-            [[['insertOne' => []]]],
-            [[['updateOne' => []]]],
-            [[['updateOne' => [['_id' => 1]]]]],
-            [[['updateMany' => []]]],
-            [[['updateMany' => [['_id' => 1]]]]],
-            [[['replaceOne' => []]]],
-            [[['replaceOne' => [['_id' => 1]]]]],
-            [[['deleteOne' => []]]],
-            [[['deleteMany' => []]]],
+        (new CommandObserver())->observe(
+            function (): void {
+                $operation = new BulkWrite(
+                    $this->getDatabaseName(),
+                    $this->getCollectionName(),
+                    [['insertOne' => [['_id' => 1]]]],
+                    ['bypassDocumentValidation' => false]
+                );
+
+                $operation->execute($this->getPrimaryServer());
+            },
+            function (array $event): void {
+                $this->assertObjectNotHasAttribute('bypassDocumentValidation', $event['started']->getCommand());
+            }
+        );
+    }
+
+    public function testBulkWriteWithPipelineUpdates(): void
+    {
+        if (version_compare($this->getServerVersion(), '4.2.0', '<')) {
+            $this->markTestSkipped('Pipeline-style updates are not supported');
+        }
+
+        $this->createFixtures(4);
+
+        $ops = [
+            ['updateOne' => [['_id' => 2], [['$addFields' => ['y' => 2]]]]],
+            ['updateMany' => [['_id' => ['$gt' => 2]], [['$addFields' => ['y' => '$_id']]]]],
         ];
-    }
 
-    /**
-     * @expectedException MongoDB\Exception\InvalidArgumentException
-     * @expectedExceptionMessage First key in $operations[0]["updateOne"][1] is not an update operator
-     */
-    public function testUpdateOneRequiresUpdateOperators()
-    {
-        new BulkWrite($this->getDatabaseName(), $this->getCollectionName(), [
-            ['updateOne' => [['_id' => 1], ['x' => 1]]],
-        ]);
-    }
+        $operation = new BulkWrite($this->getDatabaseName(), $this->getCollectionName(), $ops);
+        $result = $operation->execute($this->getPrimaryServer());
 
-    /**
-     * @expectedException MongoDB\Exception\InvalidArgumentException
-     * @expectedExceptionMessage First key in $operations[0]["updateMany"][1] is not an update operator
-     */
-    public function testUpdateManyRequiresUpdateOperators()
-    {
-        new BulkWrite($this->getDatabaseName(), $this->getCollectionName(), [
-            ['updateMany' => [['_id' => ['$gt' => 1]], ['x' => 1]]],
-        ]);
-    }
+        $this->assertInstanceOf(BulkWriteResult::class, $result);
+        $this->assertSame(3, $result->getMatchedCount());
+        $this->assertSame(3, $result->getModifiedCount());
 
-    /**
-     * @expectedException MongoDB\Exception\InvalidArgumentException
-     * @expectedExceptionMessage First key in $operations[0]["replaceOne"][1] is an update operator
-     */
-    public function testReplaceOneRequiresReplacementDocument()
-    {
-        new BulkWrite($this->getDatabaseName(), $this->getCollectionName(), [
-            ['replaceOne' => [['_id' => 1], ['$inc' => ['x' => 1]]]],
-        ]);
+        $expected = [
+            ['_id' => 1, 'x' => 11],
+            ['_id' => 2, 'x' => 22, 'y' => 2],
+            ['_id' => 3, 'x' => 33, 'y' => 3],
+            ['_id' => 4, 'x' => 44, 'y' => 4],
+        ];
+
+        $this->assertSameDocuments($expected, $this->collection->find());
     }
 
     /**
@@ -290,7 +316,7 @@ class BulkWriteFunctionalTest extends FunctionalTestCase
      *
      * @param integer $n
      */
-    private function createFixtures($n)
+    private function createFixtures(int $n): void
     {
         $bulkWrite = new Bulk(['ordered' => true]);
 

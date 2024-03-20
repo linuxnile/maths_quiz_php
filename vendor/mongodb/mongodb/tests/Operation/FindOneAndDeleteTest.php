@@ -2,25 +2,26 @@
 
 namespace MongoDB\Tests\Operation;
 
+use MongoDB\Exception\InvalidArgumentException;
 use MongoDB\Operation\FindOneAndDelete;
 
 class FindOneAndDeleteTest extends TestCase
 {
     /**
-     * @expectedException MongoDB\Exception\InvalidArgumentException
      * @dataProvider provideInvalidDocumentValues
      */
-    public function testConstructorFilterArgumentTypeCheck($filter)
+    public function testConstructorFilterArgumentTypeCheck($filter): void
     {
+        $this->expectException(InvalidArgumentException::class);
         new FindOneAndDelete($this->getDatabaseName(), $this->getCollectionName(), $filter);
     }
 
     /**
-     * @expectedException MongoDB\Exception\InvalidArgumentException
      * @dataProvider provideInvalidConstructorOptions
      */
-    public function testConstructorOptionTypeChecks(array $options)
+    public function testConstructorOptionTypeChecks(array $options): void
     {
+        $this->expectException(InvalidArgumentException::class);
         new FindOneAndDelete($this->getDatabaseName(), $this->getCollectionName(), [], $options);
     }
 

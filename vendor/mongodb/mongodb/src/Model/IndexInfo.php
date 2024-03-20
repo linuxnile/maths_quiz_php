@@ -1,9 +1,28 @@
 <?php
+/*
+ * Copyright 2015-present MongoDB, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 namespace MongoDB\Model;
 
-use MongoDB\Exception\BadMethodCallException;
 use ArrayAccess;
+use MongoDB\Exception\BadMethodCallException;
+use ReturnTypeWillChange;
+
+use function array_key_exists;
+use function array_search;
 
 /**
  * Index information model class.
@@ -16,19 +35,18 @@ use ArrayAccess;
  * db.collection.createIndex() documentation.
  *
  * @api
- * @see MongoDB\Collection::listIndexes()
+ * @see \MongoDB\Collection::listIndexes()
  * @see https://github.com/mongodb/specifications/blob/master/source/enumerate-indexes.rst
  * @see http://docs.mongodb.org/manual/reference/method/db.collection.createIndex/
  */
 class IndexInfo implements ArrayAccess
 {
+    /** @var array */
     private $info;
 
     /**
-    * Constructor.
-    *
-    * @param array $info Index info
-    */
+     * @param array $info Index info
+     */
     public function __construct(array $info)
     {
         $this->info = $info;
@@ -43,6 +61,16 @@ class IndexInfo implements ArrayAccess
     public function __debugInfo()
     {
         return $this->info;
+    }
+
+    /**
+     * Return the index name to allow casting IndexInfo to string.
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getName();
     }
 
     /**
@@ -86,6 +114,26 @@ class IndexInfo implements ArrayAccess
     }
 
     /**
+     * Return whether or not this index is of type 2dsphere.
+     *
+     * @return boolean
+     */
+    public function is2dSphere()
+    {
+        return array_search('2dsphere', $this->getKey(), true) !== false;
+    }
+
+    /**
+     * Return whether or not this index is of type geoHaystack.
+     *
+     * @return boolean
+     */
+    public function isGeoHaystack()
+    {
+        return array_search('geoHaystack', $this->getKey(), true) !== false;
+    }
+
+    /**
      * Return whether this is a sparse index.
      *
      * @see http://docs.mongodb.org/manual/core/index-sparse/
@@ -94,6 +142,16 @@ class IndexInfo implements ArrayAccess
     public function isSparse()
     {
         return ! empty($this->info['sparse']);
+    }
+
+    /**
+     * Return whether or not this index is of type text.
+     *
+     * @return boolean
+     */
+    public function isText()
+    {
+        return array_search('text', $this->getKey(), true) !== false;
     }
 
     /**
@@ -125,6 +183,7 @@ class IndexInfo implements ArrayAccess
      * @param mixed $key
      * @return boolean
      */
+    #[ReturnTypeWillChange]
     public function offsetExists($key)
     {
         return array_key_exists($key, $this->info);
@@ -142,6 +201,7 @@ class IndexInfo implements ArrayAccess
      * @param mixed $key
      * @return mixed
      */
+    #[ReturnTypeWillChange]
     public function offsetGet($key)
     {
         return $this->info[$key];
@@ -151,21 +211,28 @@ class IndexInfo implements ArrayAccess
      * Not supported.
      *
      * @see http://php.net/arrayaccess.offsetset
+     * @param mixed $key
+     * @param mixed $value
      * @throws BadMethodCallException
+     * @return void
      */
+    #[ReturnTypeWillChange]
     public function offsetSet($key, $value)
     {
-        throw BadMethodCallException::classIsImmutable(__CLASS__);
+        throw BadMethodCallException::classIsImmutable(self::class);
     }
 
     /**
      * Not supported.
      *
      * @see http://php.net/arrayaccess.offsetunset
+     * @param mixed $key
      * @throws BadMethodCallException
+     * @return void
      */
+    #[ReturnTypeWillChange]
     public function offsetUnset($key)
     {
-        throw BadMethodCallException::classIsImmutable(__CLASS__);
+        throw BadMethodCallException::classIsImmutable(self::class);
     }
 }

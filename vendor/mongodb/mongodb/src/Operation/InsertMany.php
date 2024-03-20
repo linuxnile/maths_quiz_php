@@ -1,27 +1,55 @@
 <?php
+/*
+ * Copyright 2015-present MongoDB, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 namespace MongoDB\Operation;
 
-use MongoDB\InsertManyResult;
 use MongoDB\Driver\BulkWrite as Bulk;
+use MongoDB\Driver\Exception\RuntimeException as DriverRuntimeException;
 use MongoDB\Driver\Server;
+use MongoDB\Driver\Session;
 use MongoDB\Driver\WriteConcern;
 use MongoDB\Exception\InvalidArgumentException;
+use MongoDB\Exception\UnsupportedException;
+use MongoDB\InsertManyResult;
+
+use function is_array;
+use function is_bool;
+use function is_object;
+use function sprintf;
 
 /**
  * Operation for inserting multiple documents with the insert command.
  *
  * @api
- * @see MongoDB\Collection::insertMany()
+ * @see \MongoDB\Collection::insertMany()
  * @see http://docs.mongodb.org/manual/reference/command/insert/
  */
 class InsertMany implements Executable
 {
-    private static $wireVersionForDocumentLevelValidation = 4;
-
+    /** @var string */
     private $databaseName;
+
+    /** @var string */
     private $collectionName;
+
+    /** @var object[]|array[] */
     private $documents;
+
+    /** @var array */
     private $options;
 
     /**
@@ -29,12 +57,14 @@ class InsertMany implements Executable
      *
      * Supported options:
      *
-     *  * bypassDocumentValidation (boolean): If true, allows the write to opt
-     *    out of document level validation.
+     *  * bypassDocumentValidation (boolean): If true, allows the write to
+     *    circumvent document level validation.
      *
      *  * ordered (boolean): If true, when an insert fails, return without
      *    performing the remaining writes. If false, when a write fails,
      *    continue with the remaining writes, if any. The default is true.
+     *
+     *  * session (MongoDB\Driver\Session): Client session.
      *
      *  * writeConcern (MongoDB\Driver\WriteConcern): Write concern.
      *
@@ -42,7 +72,7 @@ class InsertMany implements Executable
      * @param string           $collectionName Collection name
      * @param array[]|object[] $documents      List of documents to insert
      * @param array            $options        Command options
-     * @throws InvalidArgumentException
+     * @throws InvalidArgumentException for parameter/option parsing errors
      */
     public function __construct($databaseName, $collectionName, array $documents, array $options = [])
     {
@@ -57,7 +87,7 @@ class InsertMany implements Executable
                 throw new InvalidArgumentException(sprintf('$documents is not a list (unexpected index: "%s")', $i));
             }
 
-            if ( ! is_array($document) && ! is_object($document)) {
+            if (! is_array($document) && ! is_object($document)) {
                 throw InvalidArgumentException::invalidType(sprintf('$documents[%d]', $i), $document, 'array or object');
             }
 
@@ -70,12 +100,24 @@ class InsertMany implements Executable
             throw InvalidArgumentException::invalidType('"bypassDocumentValidation" option', $options['bypassDocumentValidation'], 'boolean');
         }
 
-        if ( ! is_bool($options['ordered'])) {
+        if (! is_bool($options['ordered'])) {
             throw InvalidArgumentException::invalidType('"ordered" option', $options['ordered'], 'boolean');
         }
 
+        if (isset($options['session']) && ! $options['session'] instanceof Session) {
+            throw InvalidArgumentException::invalidType('"session" option', $options['session'], Session::class);
+        }
+
         if (isset($options['writeConcern']) && ! $options['writeConcern'] instanceof WriteConcern) {
-            throw InvalidArgumentException::invalidType('"writeConcern" option', $options['writeConcern'], 'MongoDB\Driver\WriteConcern');
+            throw InvalidArgumentException::invalidType('"writeConcern" option', $options['writeConcern'], WriteConcern::class);
+        }
+
+        if (isset($options['bypassDocumentValidation']) && ! $options['bypassDocumentValidation']) {
+            unset($options['bypassDocumentValidation']);
+        }
+
+        if (isset($options['writeConcern']) && $options['writeConcern']->isDefault()) {
+            unset($options['writeConcern']);
         }
 
         $this->databaseName = (string) $databaseName;
@@ -90,31 +132,63 @@ class InsertMany implements Executable
      * @see Executable::execute()
      * @param Server $server
      * @return InsertManyResult
+     * @throws UnsupportedException if write concern is used and unsupported
+     * @throws DriverRuntimeException for other driver errors (e.g. connection errors)
      */
     public function execute(Server $server)
     {
-        $options = ['ordered' => $this->options['ordered']];
-
-        if (isset($this->options['bypassDocumentValidation']) && \MongoDB\server_supports_feature($server, self::$wireVersionForDocumentLevelValidation)) {
-            $options['bypassDocumentValidation'] = $this->options['bypassDocumentValidation'];
+        $inTransaction = isset($this->options['session']) && $this->options['session']->isInTransaction();
+        if ($inTransaction && isset($this->options['writeConcern'])) {
+            throw UnsupportedException::writeConcernNotSupportedInTransaction();
         }
 
-        $bulk = new Bulk($options);
+        $bulk = new Bulk($this->createBulkWriteOptions());
         $insertedIds = [];
 
         foreach ($this->documents as $i => $document) {
-            $insertedId = $bulk->insert($document);
-
-            if ($insertedId !== null) {
-                $insertedIds[$i] = $insertedId;
-            } else {
-                $insertedIds[$i] = \MongoDB\extract_id_from_inserted_document($document);
-            }
+            $insertedIds[$i] = $bulk->insert($document);
         }
 
-        $writeConcern = isset($this->options['writeConcern']) ? $this->options['writeConcern'] : null;
-        $writeResult = $server->executeBulkWrite($this->databaseName . '.' . $this->collectionName, $bulk, $writeConcern);
+        $writeResult = $server->executeBulkWrite($this->databaseName . '.' . $this->collectionName, $bulk, $this->createExecuteOptions());
 
         return new InsertManyResult($writeResult, $insertedIds);
+    }
+
+    /**
+     * Create options for constructing the bulk write.
+     *
+     * @see https://www.php.net/manual/en/mongodb-driver-bulkwrite.construct.php
+     * @return array
+     */
+    private function createBulkWriteOptions()
+    {
+        $options = ['ordered' => $this->options['ordered']];
+
+        if (isset($this->options['bypassDocumentValidation'])) {
+            $options['bypassDocumentValidation'] = $this->options['bypassDocumentValidation'];
+        }
+
+        return $options;
+    }
+
+    /**
+     * Create options for executing the bulk write.
+     *
+     * @see http://php.net/manual/en/mongodb-driver-server.executebulkwrite.php
+     * @return array
+     */
+    private function createExecuteOptions()
+    {
+        $options = [];
+
+        if (isset($this->options['session'])) {
+            $options['session'] = $this->options['session'];
+        }
+
+        if (isset($this->options['writeConcern'])) {
+            $options['writeConcern'] = $this->options['writeConcern'];
+        }
+
+        return $options;
     }
 }

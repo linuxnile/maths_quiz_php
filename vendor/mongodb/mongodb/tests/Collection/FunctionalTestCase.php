@@ -3,7 +3,6 @@
 namespace MongoDB\Tests\Collection;
 
 use MongoDB\Collection;
-use MongoDB\Operation\DropCollection;
 use MongoDB\Tests\FunctionalTestCase as BaseFunctionalTestCase;
 
 /**
@@ -11,24 +10,26 @@ use MongoDB\Tests\FunctionalTestCase as BaseFunctionalTestCase;
  */
 abstract class FunctionalTestCase extends BaseFunctionalTestCase
 {
+    /** @var Collection */
     protected $collection;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
         $this->collection = new Collection($this->manager, $this->getDatabaseName(), $this->getCollectionName());
-        $operation = new DropCollection($this->getDatabaseName(), $this->getCollectionName());
-        $operation->execute($this->getPrimaryServer());
+
+        $this->dropCollection();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         if ($this->hasFailed()) {
             return;
         }
 
-        $operation = new DropCollection($this->getDatabaseName(), $this->getCollectionName());
-        $operation->execute($this->getPrimaryServer());
+        $this->dropCollection();
+
+        parent::tearDown();
     }
 }

@@ -2,36 +2,37 @@
 
 namespace MongoDB\Tests\Operation;
 
+use MongoDB\Exception\InvalidArgumentException;
 use MongoDB\Operation\Update;
 
 class UpdateTest extends TestCase
 {
     /**
-     * @expectedException MongoDB\Exception\InvalidArgumentException
-     * @expectedExceptionMessageRegExp /Expected \$filter to have type "array or object" but found "[\w ]+"/
      * @dataProvider provideInvalidDocumentValues
      */
-    public function testConstructorFilterArgumentTypeCheck($filter)
+    public function testConstructorFilterArgumentTypeCheck($filter): void
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/Expected \$filter to have type "array or object" but found "[\w ]+"/');
         new Update($this->getDatabaseName(), $this->getCollectionName(), $filter, ['$set' => ['x' => 1]]);
     }
 
     /**
-     * @expectedException MongoDB\Exception\InvalidArgumentException
-     * @expectedExceptionMessageRegExp /Expected \$update to have type "array or object" but found "[\w ]+"/
      * @dataProvider provideInvalidDocumentValues
      */
-    public function testConstructorUpdateArgumentTypeCheck($update)
+    public function testConstructorUpdateArgumentTypeCheck($update): void
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/Expected \$update to have type "array or object" but found "[\w ]+"/');
         new Update($this->getDatabaseName(), $this->getCollectionName(), ['x' => 1], $update);
     }
 
     /**
-     * @expectedException MongoDB\Exception\InvalidArgumentException
      * @dataProvider provideInvalidConstructorOptions
      */
-    public function testConstructorOptionTypeChecks(array $options)
+    public function testConstructorOptionTypeChecks(array $options): void
     {
+        $this->expectException(InvalidArgumentException::class);
         new Update($this->getDatabaseName(), $this->getCollectionName(), ['x' => 1], ['y' => 1], $options);
     }
 
@@ -39,15 +40,27 @@ class UpdateTest extends TestCase
     {
         $options = [];
 
+        foreach ($this->getInvalidArrayValues() as $value) {
+            $options[][] = ['arrayFilters' => $value];
+        }
+
         foreach ($this->getInvalidBooleanValues() as $value) {
             $options[][] = ['bypassDocumentValidation' => $value];
         }
 
-        foreach ($this->getInvalidBooleanValues() as $value) {
+        foreach ($this->getInvalidDocumentValues() as $value) {
+            $options[][] = ['collation' => $value];
+        }
+
+        foreach ($this->getInvalidBooleanValues(true) as $value) {
             $options[][] = ['multi' => $value];
         }
 
-        foreach ($this->getInvalidBooleanValues() as $value) {
+        foreach ($this->getInvalidSessionValues() as $value) {
+            $options[][] = ['session' => $value];
+        }
+
+        foreach ($this->getInvalidBooleanValues(true) as $value) {
             $options[][] = ['upsert' => $value];
         }
 

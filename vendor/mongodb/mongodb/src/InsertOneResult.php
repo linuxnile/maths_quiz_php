@@ -1,4 +1,19 @@
 <?php
+/*
+ * Copyright 2015-present MongoDB, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 namespace MongoDB;
 
@@ -10,13 +25,16 @@ use MongoDB\Exception\BadMethodCallException;
  */
 class InsertOneResult
 {
+    /** @var WriteResult */
     private $writeResult;
+
+    /** @var mixed */
     private $insertedId;
+
+    /** @var boolean */
     private $isAcknowledged;
 
     /**
-     * Constructor.
-     *
      * @param WriteResult $writeResult
      * @param mixed       $insertedId
      */
@@ -48,9 +66,9 @@ class InsertOneResult
     /**
      * Return the inserted document's ID.
      *
-     * If the document already an ID prior to insertion (i.e. the driver did not
+     * If the document had an ID prior to inserting (i.e. the driver did not
      * need to generate an ID), this will contain its "_id". Any
-     * driver-generated ID will be an MongoDB\Driver\ObjectID instance.
+     * driver-generated ID will be a MongoDB\BSON\ObjectId instance.
      *
      * @return mixed
      */

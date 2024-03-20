@@ -2,31 +2,36 @@
 
 namespace MongoDB\Tests\Operation;
 
+use MongoDB\Exception\InvalidArgumentException;
 use MongoDB\Operation\Count;
 
 class CountTest extends TestCase
 {
     /**
-     * @expectedException MongoDB\Exception\InvalidArgumentException
      * @dataProvider provideInvalidDocumentValues
      */
-    public function testConstructorFilterArgumentTypeCheck($filter)
+    public function testConstructorFilterArgumentTypeCheck($filter): void
     {
+        $this->expectException(InvalidArgumentException::class);
         new Count($this->getDatabaseName(), $this->getCollectionName(), $filter);
     }
 
     /**
-     * @expectedException MongoDB\Exception\InvalidArgumentException
      * @dataProvider provideInvalidConstructorOptions
      */
-    public function testConstructorOptionTypeChecks(array $options)
+    public function testConstructorOptionTypeChecks(array $options): void
     {
+        $this->expectException(InvalidArgumentException::class);
         new Count($this->getDatabaseName(), $this->getCollectionName(), [], $options);
     }
 
     public function provideInvalidConstructorOptions()
     {
         $options = [];
+
+        foreach ($this->getInvalidDocumentValues() as $value) {
+            $options[][] = ['collation' => $value];
+        }
 
         foreach ($this->getInvalidHintValues() as $value) {
             $options[][] = ['hint' => $value];
@@ -46,6 +51,10 @@ class CountTest extends TestCase
 
         foreach ($this->getInvalidReadPreferenceValues() as $value) {
             $options[][] = ['readPreference' => $value];
+        }
+
+        foreach ($this->getInvalidSessionValues() as $value) {
+            $options[][] = ['session' => $value];
         }
 
         foreach ($this->getInvalidIntegerValues() as $value) {

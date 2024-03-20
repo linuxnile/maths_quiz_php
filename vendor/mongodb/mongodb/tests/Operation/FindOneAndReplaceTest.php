@@ -2,43 +2,42 @@
 
 namespace MongoDB\Tests\Operation;
 
+use MongoDB\Exception\InvalidArgumentException;
 use MongoDB\Operation\FindOneAndReplace;
 
 class FindOneAndReplaceTest extends TestCase
 {
     /**
-     * @expectedException MongoDB\Exception\InvalidArgumentException
      * @dataProvider provideInvalidDocumentValues
      */
-    public function testConstructorFilterArgumentTypeCheck($filter)
+    public function testConstructorFilterArgumentTypeCheck($filter): void
     {
+        $this->expectException(InvalidArgumentException::class);
         new FindOneAndReplace($this->getDatabaseName(), $this->getCollectionName(), $filter, []);
     }
 
     /**
-     * @expectedException MongoDB\Exception\InvalidArgumentException
      * @dataProvider provideInvalidDocumentValues
      */
-    public function testConstructorReplacementArgumentTypeCheck($replacement)
+    public function testConstructorReplacementArgumentTypeCheck($replacement): void
     {
+        $this->expectException(InvalidArgumentException::class);
         new FindOneAndReplace($this->getDatabaseName(), $this->getCollectionName(), [], $replacement);
     }
 
-    /**
-     * @expectedException MongoDB\Exception\InvalidArgumentException
-     * @expectedExceptionMessage First key in $replacement argument is an update operator
-     */
-    public function testConstructorReplacementArgumentRequiresNoOperators()
+    public function testConstructorReplacementArgumentRequiresNoOperators(): void
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('First key in $replacement argument is an update operator');
         new FindOneAndReplace($this->getDatabaseName(), $this->getCollectionName(), [], ['$set' => ['x' => 1]]);
     }
 
     /**
-     * @expectedException MongoDB\Exception\InvalidArgumentException
      * @dataProvider provideInvalidConstructorOptions
      */
-    public function testConstructorOptionTypeChecks(array $options)
+    public function testConstructorOptionTypeChecks(array $options): void
     {
+        $this->expectException(InvalidArgumentException::class);
         new FindOneAndReplace($this->getDatabaseName(), $this->getCollectionName(), [], [], $options);
     }
 
@@ -50,7 +49,7 @@ class FindOneAndReplaceTest extends TestCase
             $options[][] = ['projection' => $value];
         }
 
-        foreach ($this->getInvalidIntegerValues() as $value) {
+        foreach ($this->getInvalidIntegerValues(true) as $value) {
             $options[][] = ['returnDocument' => $value];
         }
 
@@ -58,11 +57,11 @@ class FindOneAndReplaceTest extends TestCase
     }
 
     /**
-     * @expectedException MongoDB\Exception\InvalidArgumentException
      * @dataProvider provideInvalidConstructorReturnDocumentOptions
      */
-    public function testConstructorReturnDocumentOption($returnDocument)
+    public function testConstructorReturnDocumentOption($returnDocument): void
     {
+        $this->expectException(InvalidArgumentException::class);
         new FindOneAndReplace($this->getDatabaseName(), $this->getCollectionName(), [], [], ['returnDocument' => $returnDocument]);
     }
 

@@ -8,33 +8,46 @@ use ReflectionClass;
 use ReflectionMethod;
 use RegexIterator;
 
+use function array_filter;
+use function array_map;
+use function realpath;
+use function str_replace;
+use function strcasecmp;
+use function strlen;
+use function substr;
+use function usort;
+
+use const DIRECTORY_SEPARATOR;
+
 /**
  * Pedantic tests that have nothing to do with functional correctness.
  */
-class PedantryTest extends \PHPUnit_Framework_TestCase
+class PedantryTest extends TestCase
 {
     /**
      * @dataProvider provideProjectClassNames
      */
-    public function testMethodsAreOrderedAlphabeticallyByVisibility($className)
+    public function testMethodsAreOrderedAlphabeticallyByVisibility($className): void
     {
         $class = new ReflectionClass($className);
         $methods = $class->getMethods();
 
         $methods = array_filter(
             $methods,
-            function(ReflectionMethod $method) use ($class) {
+            function (ReflectionMethod $method) use ($class) {
                 return $method->getDeclaringClass() == $class;
             }
         );
 
-        $getSortValue = function(ReflectionMethod $method) {
+        $getSortValue = function (ReflectionMethod $method) {
             if ($method->getModifiers() & ReflectionMethod::IS_PRIVATE) {
                 return '2' . $method->getName();
             }
+
             if ($method->getModifiers() & ReflectionMethod::IS_PROTECTED) {
                 return '1' . $method->getName();
             }
+
             if ($method->getModifiers() & ReflectionMethod::IS_PUBLIC) {
                 return '0' . $method->getName();
             }
@@ -43,13 +56,17 @@ class PedantryTest extends \PHPUnit_Framework_TestCase
         $sortedMethods = $methods;
         usort(
             $sortedMethods,
-            function(ReflectionMethod $a, ReflectionMethod $b) use ($getSortValue) {
+            function (ReflectionMethod $a, ReflectionMethod $b) use ($getSortValue) {
                 return strcasecmp($getSortValue($a), $getSortValue($b));
             }
         );
 
-        $methods = array_map(function(ReflectionMethod $method) { return $method->getName(); }, $methods);
-        $sortedMethods = array_map(function(ReflectionMethod $method) { return $method->getName(); }, $sortedMethods);
+        $methods = array_map(function (ReflectionMethod $method) {
+            return $method->getName();
+        }, $methods);
+        $sortedMethods = array_map(function (ReflectionMethod $method) {
+            return $method->getName();
+        }, $sortedMethods);
 
         $this->assertEquals($sortedMethods, $methods);
     }
