@@ -26,9 +26,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = $collection->insertOne($messageData);
 
     if ($result->getInsertedCount() > 0) {
+
         $mail = new PHPMailer(true);
         try {
             
+            $mail->isSMTP();
             $mail->Host = 'smtp.gmail.com';
             $mail->SMTPAuth = true;
             $mail->Username = 'kaushik91ahir@gmail.com';
