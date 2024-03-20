@@ -43,14 +43,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $mail->AltBody = 'Thank you for contacting us. We will get back to you soon.';
             $mail->send();
             echo "<script>alert('Message sent successfully!')</script>";
-            echo "<script>window.location.href='contact.php';</script>";
+            echo "<script>window.location.href='index.php?contact';</script>";
         } catch (Exception $e) {
             echo "<script>alert('Failed to send message.')</script>";
-            echo "<script>window.location.href='contact.php';</script>";
+            echo "<script>window.location.href='index.php?contact';</script>";
         }
     } else {
         echo "<script>alert('Failed to send message.')</script>";
-        echo "<script>window.location.href='contact.php';</script>";
+        echo "<script>window.location.href='index.php?contact';</script>";
     }
 }
 ?>
