@@ -1,81 +1,72 @@
-<?php
-
-require '../vendor/autoload.php';
-$mongoClient = new MongoDB\Client("mongodb://localhost:27017");
-$collection = $mongoClient->mathsquiz->questions;
-
-
-function addQuestion(string $question, array $options, int $correctOptionIndex, string $category): string
-{
-    global $collection;
-    $result = $collection->insertOne([
-        'question' => $question,
-        'options' => $options,
-        'correctOptionIndex' => $correctOptionIndex,
-        'category' => $category,
-        'createdAt' => new MongoDB\BSON\UTCDateTime(),
-    ]);
-    return (string)$result->getInsertedId();
-}
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $question = $_POST['question'];
-    $options = [
-        $_POST['option1'],
-        $_POST['option2'],
-        $_POST['option3'],
-        $_POST['option4']
-    ];
-    $correctOptionIndex = (int)$_POST['correctOptionIndex'];
-    $category = $_POST['category'];
-
-    $insertedId = addQuestion($question, $options, $correctOptionIndex, $category);
-    if ($insertedId) {
-        echo "<script>alert('Question added successfully with ID: " . $insertedId . "')</script>";
-        echo "<script>window.location.href='add_questions.php';</script>";
-    } else {
-        echo "Error adding question.";
-    }
-}
-
-?>
-
 <!DOCTYPE html>
 <html>
 
 <head>
-    <title>Add Question</title>
+    <title>Insert Quiz Question</title>
 </head>
 
 <body>
-    <h2>Add Question</h2>
-    <form method="post" action="">
-        <label>Question:</label><br>
-        <input type="text" name="question" placeholder="Enter the question" required><br><br>
+    <h2>Insert a new MCQ Question</h2>
+    <form action="" method="post">
+        <label for="question">Question:</label><br>
+        <input type="text" id="question" name="question" required><br>
 
-        <label>Options:</label><br>
-        <?php for ($i = 1; $i <= 4; $i++) : ?>
-            <input type="text" name="option<?php echo $i; ?>" placeholder="Enter option <?php echo $i; ?>" required><br>
-        <?php endfor; ?><br>
+        <label for="optionA">Option A:</label><br>
+        <input type="text" id="optionA" name="optionA" required><br>
 
-        <label>Correct Option:</label><br>
-        <select name="correctOptionIndex">
-            <?php for ($i = 0; $i < 4; $i++) : ?>
-                <option value="<?php echo $i; ?>"><?php echo $i + 1; ?></option>
-            <?php endfor; ?>
+        <label for="optionB">Option B:</label><br>
+        <input type="text" id="optionB" name="optionB" required><br>
+
+        <label for="optionC">Option C:</label><br>
+        <input type="text" id="optionC" name="optionC" required><br>
+
+        <label for="optionD">Option D:</label><br>
+        <input type="text" id="optionD" name="optionD" required><br>
+
+        <label for="answer">Correct Answer:</label><br>
+        <select id="answer" name="answer" required>
+            <option value="A">Option A</option>
+            <option value="B">Option B</option>
+            <option value="C">Option C</option>
+            <option value="D">Option D</option>
         </select><br><br>
 
-        <label>Category:</label><br>
-        <select name="category">
-            <option value="1">Standard 1</option>
-            <option value="2">Standard 2</option>
-            <option value="3">Standard 3</option>
-            <option value="4">Standard 4</option>
-            <option value="5">Standard 5</option>
-        </select><br><br>
-
-        <input type="submit" value="Add Question">
+        <input type="submit" value="Insert Question">
     </form>
 </body>
 
 </html>
+
+<?php
+require '../vendor/autoload.php'; // Include Composer's autoloader
+
+// Connect to MongoDB
+$client = new MongoDB\Client("mongodb://localhost:27017");
+$quizDB = $client->selectDatabase('mathsquiz');
+$questionsCollection = $quizDB->selectCollection('questions');
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Retrieve form data
+    $questionText = $_POST['question'];
+    $options = [
+        'A' => $_POST['optionA'],
+        'B' => $_POST['optionB'],
+        'C' => $_POST['optionC'],
+        'D' => $_POST['optionD']
+    ];
+    $answer = $_POST['answer'];
+
+    // Insert the new question
+    $insertResult = $questionsCollection->insertOne([
+        'question' => $questionText,
+        'options' => $options,
+        'answer' => $answer
+    ]);
+
+    if ($insertResult->getInsertedCount() == 1) {
+        echo "Question inserted successfully";
+    } else {
+        echo "Error inserting question";
+    }
+}
+?>
