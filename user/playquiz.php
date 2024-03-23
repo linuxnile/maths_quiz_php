@@ -2,25 +2,20 @@
 
 if (isset($_SESSION["signedin"]) == true) {
 
-    require '../vendor/autoload.php'; // Include Composer's autoloader
+    require '../vendor/autoload.php';
 
-    // Connect to MongoDB
     $client = new MongoDB\Client("mongodb://localhost:27017");
     $quizDB = $client->selectDatabase('mathsquiz');
     $questionsCollection = $quizDB->selectCollection('questions');
 
-    // Retrieve all questions
     $questions = $questionsCollection->find()->toArray();
 
-    // Initialize quiz session variables
     if (!isset($_SESSION['current_question'])) {
         $_SESSION['current_question'] = 0;
         $_SESSION['score'] = 0;
     }
 
-    // Check if 'submit' button was pressed
     if (isset($_POST['submit'])) {
-        // Check answer
         $currentQuestion = $questions[$_SESSION['current_question']];
         if ($_POST['answer'] === $currentQuestion['answer']) {
             $_SESSION['score']++;
@@ -28,13 +23,11 @@ if (isset($_SESSION["signedin"]) == true) {
         $_SESSION['current_question']++;
     }
 
-    // Get the current question
     $currentQuestion = $questions[$_SESSION['current_question']] ?? null;
 
-    // Check if we reached the last question
     if ($_SESSION['current_question'] >= count($questions)) {
         echo "Quiz completed! Your score: " . $_SESSION['score'];
-        session_destroy(); // End the session
+        session_destroy();
         exit();
     }
 ?>
@@ -43,7 +36,7 @@ if (isset($_SESSION["signedin"]) == true) {
     <html>
 
     <head>
-        <title>Math Quiz</title>
+        <title>Play Quiz</title>
     </head>
 
     <body>
@@ -52,7 +45,7 @@ if (isset($_SESSION["signedin"]) == true) {
                 <p><?php echo $currentQuestion['question']; ?></p>
                 <?php foreach ($currentQuestion['options'] as $key => $value) : ?>
                     <label>
-                        <input type="radio" name="answer" value="<?php echo $key; ?>">
+                        <input type="radio" name="answer" required value="<?php echo $key; ?>">
                         <?php echo $key . ': ' . $value; ?>
                     </label><br>
                 <?php endforeach; ?>

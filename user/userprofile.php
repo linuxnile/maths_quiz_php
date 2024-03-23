@@ -23,7 +23,7 @@ if (isset($_SESSION["signedin"]) == true) {
     <html>
 
     <head>
-        <title>Update Your Profile</title>
+        <title>Profile</title>
         <link rel="stylesheet" href="css/userprofile.css">
     </head>
 
