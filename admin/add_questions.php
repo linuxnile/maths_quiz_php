@@ -43,6 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html>
 <head>
     <title>Add Question</title>
+    <link rel="stylesheet" href="css/question.css">
 </head>
 <body>
     <h2>Add Question</h2>
