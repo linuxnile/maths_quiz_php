@@ -1,4 +1,8 @@
 <?php
+
+session_name("user");
+session_start();
+
 require '../vendor/autoload.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
@@ -29,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $mail = new PHPMailer(true);
         try {
-            
+
             $mail->isSMTP();
             $mail->Host = 'smtp.gmail.com';
             $mail->SMTPAuth = true;
@@ -39,7 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $mail->Port = 587;
             $mail->setFrom('kaushik91ahir@gmail.com', 'Kaushik');
             $mail->addAddress($email, $name);
-            $mail->isHTML(true); 
+            $mail->isHTML(true);
             $mail->Subject = 'Thank you for contacting us!';
             $mail->Body = 'Dear ' . $name . ',<br><br>Thank you for contacting us. We have received your message and will get back to you as soon as possible.<br><br>Best regards,<br>Maths Quiz for kids';
             $mail->AltBody = 'Thank you for contacting us. We will get back to you soon.';
@@ -64,6 +68,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 
 <body>
+    <?php include('header.php'); ?>
+
     <div class="container">
         <h2>Contact Us</h2>
 

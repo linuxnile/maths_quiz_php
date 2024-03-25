@@ -6,6 +6,8 @@
 </head>
 
 <body>
+    <?php include('header.php'); ?>
+
     <div class="registration-form">
         <h2>User Registration</h2>
 

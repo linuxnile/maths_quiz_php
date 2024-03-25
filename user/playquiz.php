@@ -1,5 +1,8 @@
 <?php
 
+session_name("user");
+session_start();
+
 if (isset($_SESSION["signedin"]) == true) {
 
     require '../vendor/autoload.php';
@@ -32,14 +35,15 @@ if (isset($_SESSION["signedin"]) == true) {
     }
 ?>
 
-    <!DOCTYPE html>
     <html>
 
     <head>
-        <title>Play Quiz</title>
+        <title>Play the Quiz</title>
     </head>
 
     <body>
+        <?php include('header.php'); ?>
+
         <?php if ($currentQuestion) : ?>
             <form method="post">
                 <p><?php echo $currentQuestion['question']; ?></p>
@@ -57,7 +61,10 @@ if (isset($_SESSION["signedin"]) == true) {
     </html>
 
 <?php } else {
-    header("Location: index.php");
-    exit();
+    echo
+    '<script>
+    alert("Please login to Start the Quiz!");
+    window.location.href = "login.php";
+</script>';
 }
 ?>

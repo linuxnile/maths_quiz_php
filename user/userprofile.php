@@ -1,5 +1,8 @@
 <?php
 
+session_name("user");
+session_start();
+
 if (isset($_SESSION["signedin"]) == true) {
     require '../vendor/autoload.php';
 
@@ -28,8 +31,9 @@ if (isset($_SESSION["signedin"]) == true) {
     </head>
 
     <body>
-        <div class="profile-form">
+        <?php include('header.php'); ?>
 
+        <div class="profile-form">
             <h2>Update Your Profile</h2>
             <form action="" method="post">
                 <div class="form-part">

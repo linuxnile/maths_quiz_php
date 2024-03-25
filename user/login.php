@@ -6,6 +6,8 @@
 </head>
 
 <body>
+    <?php include('header.php'); ?>
+
     <div class="login-form">
         <h2>User Login</h2>
         <form action="" method="post">
