@@ -92,7 +92,7 @@ if (isset($_SESSION["signedin"]) == true) {
 
                     <div class="chngpwd">
                         Wanna change password?
-                        <a href="#">Click here</a>
+                        <a href="userpasswd.php">Click here</a>
                     </div>
                 </div>
 
