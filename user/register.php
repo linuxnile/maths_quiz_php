@@ -1,3 +1,51 @@
+<?php
+require '../vendor/autoload.php';
+session_name("user");
+session_start();
+
+if (isset($_SESSION["signedin"]) == true) {
+    header("Location: index.php");
+    exit;
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $name = $_POST['name'];
+    $email = $_POST['email'];
+    $standard = $_POST['std'];
+    $address_line = $_POST['add_line'];
+    $city = $_POST['city'];
+    $mobile_number = $_POST['mobileNo'];
+    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    $security_question = $_POST['secQts'];
+    $security_answer = $_POST['secAns'];
+
+    $mongoClient = new MongoDB\Client("mongodb://localhost:27017");
+    $database = $mongoClient->mathsquiz;
+    $collection = $database->users;
+
+    $insertResult = $collection->insertOne(
+        [
+            'name' => $name,
+            'email' => $email,
+            'standard' => $standard,
+            'address_line' => $address_line,
+            'city' => $city,
+            'mobile_number' => $mobile_number,
+            'password' => $password,
+            'security_question' => $security_question,
+            'security_answer' => $security_answer
+        ]
+    );
+
+    if ($insertResult->getInsertedCount() > 0) {
+        echo "<script>alert('User Registered Successfully!')</script>";
+        echo "<script>window.location.href='login.php';</script>";
+    } else {
+        echo "User registration failed.";
+    }
+}
+?>
+
 <html>
 
 <head>
@@ -90,44 +138,3 @@
 </body>
 
 </html>
-
-<?php
-require '../vendor/autoload.php';
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $name = $_POST['name'];
-    $email = $_POST['email'];
-    $standard = $_POST['std'];
-    $address_line = $_POST['add_line'];
-    $city = $_POST['city'];
-    $mobile_number = $_POST['mobileNo'];
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-    $security_question = $_POST['secQts'];
-    $security_answer = $_POST['secAns'];
-
-    $mongoClient = new MongoDB\Client("mongodb://localhost:27017");
-    $database = $mongoClient->mathsquiz;
-    $collection = $database->users;
-
-    $insertResult = $collection->insertOne(
-        [
-            'name' => $name,
-            'email' => $email,
-            'standard' => $standard,
-            'address_line' => $address_line,
-            'city' => $city,
-            'mobile_number' => $mobile_number,
-            'password' => $password,
-            'security_question' => $security_question,
-            'security_answer' => $security_answer
-        ]
-    );
-
-    if ($insertResult->getInsertedCount() > 0) {
-        echo "<script>alert('User Registered Successfully!')</script>";
-        echo "<script>window.location.href='login.php';</script>";
-    } else {
-        echo "User registration failed.";
-    }
-}
-?>
