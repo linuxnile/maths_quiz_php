@@ -49,3 +49,8 @@ p {
 .nav a:hover {
   text-decoration: underline;
 }
+
+.user-icon {
+  width: 15px;
+  height: auto;
+}
