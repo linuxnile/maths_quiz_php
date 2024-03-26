@@ -1,23 +1,33 @@
 <?php
 session_name("user");
 session_start();
-session_unset();
-session_destroy();
+if (isset($_GET['logout']) && $_GET['logout'] == 'yes') {
+    session_unset();
+    session_destroy();
+    echo "<script>
+        alert('You have been logged out!');
+        window.location.href = 'index.php';
+    </script>";
+}
 ?>
 
 <html>
 
 <head>
-    <title>Logged Out</title>
+    <title>Logout</title>
 </head>
 
 <body>
-    echo "<script>
-        alert('You have been logged out!');
-    </script>";
-    echo "<script>
-        window.location.href = 'index.php';
-    </script>";
+    <script>
+        window.onload = function() {
+            var logout = confirm('Are you sure you want to log out?');
+            if (logout) {
+                window.location.href = '?logout=yes';
+            } else {
+                window.location.href = 'index.php';
+            }
+        }
+    </script>
 </body>
 
 </html>
