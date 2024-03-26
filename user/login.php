@@ -57,6 +57,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <input type="password" name="password" id="password" required placeholder="Enter password" />
             </label>
             <br />
+            <div>
+                <a href="pwdreset.php">Forgot Password?</a>
+            </div>
+            <br>
             <button type="submit">Log In</button>
             <div>
                 Don't have an account? <a href="register.php">Register</a>
