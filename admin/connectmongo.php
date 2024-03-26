@@ -7,7 +7,7 @@ $databaseConnection = new MongoDB\Client;
 $myDatabase = $databaseConnection->mathsquiz; 
 
 $adminCollection = $myDatabase->admin; 
-$messageCollection = $myDatabase->messages;
+$messageCollection = $myDatabase->feedback;
 $userCollection = $myDatabase->users;
 $questionsCollection = $myDatabase->questions;
 
