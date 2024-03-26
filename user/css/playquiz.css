@@ -29,35 +29,35 @@ body {
   transition: background-color 0.3s ease;
 }
 
-.level-easy {
+.category-easy {
   background-color: #77dd77;
 }
 
-.level-easy:hover {
+.category-easy:hover {
   background-color: #68c968;
 }
 
-.level-normal {
+.category-normal {
   background-color: #ffdb58;
 }
 
-.level-normal:hover {
+.category-normal:hover {
   background-color: #e6c300;
 }
 
-.level-hard {
+.category-hard {
   background-color: #ff6961;
 }
 
-.level-hard:hover {
+.category-hard:hover {
   background-color: #fe4c40;
 }
 
-.level-expert {
+.category-expert {
   background-color: #b19cd9;
 }
 
-.level-expert:hover {
+.category-expert:hover {
   background-color: #9d7fb1;
 }
 

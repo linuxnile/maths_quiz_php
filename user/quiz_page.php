@@ -9,7 +9,7 @@ if (isset($_SESSION["signedin"]) == true) {
     $database = $mongoClient->mathsquiz;
     $collection = $database->questions;
 
-    if (!isset($_SESSION['quiz_level'])) {
+    if (!isset($_SESSION['category'])) {
         header('Location: index.php');
         exit();
     }
@@ -20,12 +20,12 @@ if (isset($_SESSION["signedin"]) == true) {
         $_SESSION['answers'] = [];
     }
 
-    $quizLevel = $_SESSION['quiz_level'];
-    $questions = $collection->find(['category' => $quizLevel])->toArray();
+    $category = $_SESSION['category'];
+    $questions = $collection->find(['category' => $category])->toArray();
     $totalQuestions = count($questions);
 
     if ($totalQuestions == 0) {
-        $_SESSION['message'] = 'No questions available for this quiz level. Please try again later.';
+        $_SESSION['message'] = 'No questions available for this quiz category. Please try again later.';
         header('Location: results_page.php');
         exit();
     }
@@ -57,7 +57,7 @@ if (isset($_SESSION["signedin"]) == true) {
 
             $scoreData = [
                 'email' => $_SESSION['email'],
-                'quiz_level' => $quizLevel,
+                'category' => $category,
                 'score' => $score,
                 'date' => $date
             ];
@@ -91,7 +91,7 @@ if (isset($_SESSION["signedin"]) == true) {
         <?php include('header.php'); ?>
 
         <div class="quiz-container">
-            <h1>Quiz: <?php echo ucfirst($quizLevel); ?> Level</h1>
+            <h1>Quiz: <?php echo ucfirst($category); ?> Category</h1>
             <form action="" method="post">
                 <div class="question">
                     <h2><?php echo $currentQuestion['question']; ?></h2>
