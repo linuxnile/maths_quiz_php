@@ -56,6 +56,7 @@ if (isset($_SESSION["signedin"]) == true) {
             $date = date('d-m-Y H:i:s', $listTimestamp);
 
             $score = $_SESSION['score'] . '/' . $totalQuestions;
+            $_SESSION['totalQuestions'] = $totalQuestions;
 
             $scoreData = [
                 'email' => $_SESSION['email'],
@@ -68,13 +69,11 @@ if (isset($_SESSION["signedin"]) == true) {
             $insertResult = $collection_score->insertOne($scoreData);
 
             if ($insertResult->getInsertedCount() == 1) {
-                // Redirect to a results page with a success message
                 $_SESSION['message'] = 'Your score has been successfully saved!';
                 header('Location: results_page.php');
             }
             exit();
         } else {
-            // Redirect to a results page with an error message
             $_SESSION['message'] = 'There was an error saving your score. Please try again.';
             header('Location: results_page.php');
         }
