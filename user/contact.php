@@ -8,11 +8,32 @@ require '../vendor/autoload.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
+if (isset($_SESSION["signedin"]) == true) {
+    require '../vendor/autoload.php';
+
+    $mongoClient = new MongoDB\Client("mongodb://localhost:27017");
+    $database = $mongoClient->mathsquiz;
+    $collection = $database->users;
+    $user = $collection->findOne([
+        "email" => $_SESSION["email"]
+    ]);
+
+    if ($user) {
+        $userName = $user->name;
+        $userEmail = $user->email;
+    }} else {
+        $userName = '';
+        $userEmail = '';
+    } 
+    
 //$user_id = $_SESSION['user_id'] ?? '';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST['name'];
     $email = $_POST['email'];
     $msg = $_POST['msg'];
+    date_default_timezone_set('Asia/Kolkata');
+    $listTimestamp = time();
+    $send_time = date('d-m-Y H:i:s', $listTimestamp);
 
     $mongoClient = new MongoDB\Client("mongodb://localhost:27017");
     $database = $mongoClient->mathsquiz;
@@ -23,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         'name' => $name,
         'email' => $email,
         'message' => $msg,
-        'timestamp' => new MongoDB\BSON\UTCDateTime(),
+        'timestamp' => $send_time,
         'replied' => false
     ];
 
@@ -49,14 +70,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $mail->AltBody = 'Thank you for contacting us. We will get back to you soon.';
             $mail->send();
             echo "<script>alert('Message sent successfully!')</script>";
-            echo "<script>window.location.href='index.php?contact';</script>";
+            echo "<script>window.location.href='contact.php';</script>";
         } catch (Exception $e) {
             echo "<script>alert('Failed to send message.')</script>";
-            echo "<script>window.location.href='index.php?contact';</script>";
+            echo "<script>window.location.href='contact.php';</script>";
         }
     } else {
         echo "<script>alert('Failed to send message.')</script>";
-        echo "<script>window.location.href='index.php?contact';</script>";
+        echo "<script>window.location.href='contact.php';</script>";
+        // echo "<script>window.location.href='index.php?contact';</script>";
     }
 }
 ?>
@@ -75,11 +97,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <form action="" method="post">
             <label for="name">Name</label>
-            <input type="text" id="name" name="name" required placeholder="Enter your name">
+            <?php if ($userName): ?>
+                <input type="text" id="name" name="name" value="<?= $userName ?>" readonly>
+            <?php else: ?>
+                <input type="text" id="name" name="name" required placeholder="Enter your name">
+            <?php endif; ?>
 
             <label for="email">Email</label>
-            <input type="email" id="email" name="email" required placeholder="Enter your email">
-
+            <?php if ($userEmail): ?>
+                <input type="email" id="email" name="email" value="<?= $userEmail ?>" readonly>
+            <?php else: ?>
+                <input type="email" id="email" name="email" required placeholder="Enter your email">
+            <?php endif; ?>
+            
             <label for="message">Message</label>
             <textarea id="message" name="msg" rows="4" required placeholder="Write your message"></textarea>
 
