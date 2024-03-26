@@ -1,5 +1,7 @@
 <?php
 require '../vendor/autoload.php';
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 session_name("user");
 session_start();
 
@@ -42,8 +44,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     );
 
     if ($insertResult->getInsertedCount() > 0) {
-        echo "<script>alert('User Registered Successfully!')</script>";
-        echo "<script>window.location.href='login.php';</script>";
+        // Send a thank you email
+        $mail = new PHPMailer(true);
+        try {
+            $mail->isSMTP();
+            $mail->Host = 'smtp.gmail.com';
+            $mail->SMTPAuth = true;
+            $mail->Username = 'kaushik91ahir@gmail.com';
+            $mail->Password = '';
+            $mail->SMTPSecure = 'tls';
+            $mail->Port = 587;
+            $mail->setFrom('kaushik91ahir@gmail.com', 'Kaushik');
+            $mail->addAddress($email, $name);
+            $mail->isHTML(true);
+            $mail->Subject = 'Thank You for Joining Us!';
+            $mail->Body = 'Dear ' . $name . ',<br><br>Thank you for joining us! Here are your registration details:<br><br>Name: ' . $name . '<br>Email: ' . $email . '<br>Registration Time: ' . $registration_date . '<br><br>We are excited to have you as a member of our community.<br><br>Best regards,<br>Maths Quiz For kids';
+            $mail->AltBody = 'Thank you for joining us! Here are your registration details:\n\nName: ' . $name . '\nEmail: ' . $email . '\nRegistration Time: ' . $registration_date . '\n\nWe are excited to have you as a member of our community.';
+            $mail->send();
+            echo "<script>alert('User Registered Successfully!')</script>";
+            echo "<script>window.location.href='login.php';</script>";
+        } catch (Exception $e) {
+            echo "<script>alert('User Registered Successfully, but failed to send the thank you email.')</script>";
+            echo "<script>window.location.href='login.php';</script>";
+        }
     } else {
         echo "User registration failed.";
     }

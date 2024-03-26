@@ -9,6 +9,15 @@ if (!isset($admin_id)) {
     header('location:admin_login.php');
 }
 
+if (isset($_GET['delete'])) {
+    $delete_id = $_GET['delete'];
+    // Delete user from the users collection
+    $userCollection->deleteOne(['_id' => new MongoDB\BSON\ObjectID($delete_id)]);
+    // Delete Quiz scores associated with the user
+    //$scoreCollection->deleteMany(['user_id' => $delete_id]);
+
+    header('location:users_accounts.php');
+ }
 ?>
 <!DOCTYPE html>
 <html lang="en">

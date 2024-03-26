@@ -82,7 +82,7 @@ if (isset($_POST['send_reply'])) {
                   <p>Name: <span><?= $message['name']; ?></span></p>
                   <p>Email: <span><?= $message['email']; ?></span></p>
                   <p>Message: <span><?= $message['message']; ?></span></p>
-                  <p>Timestamp: <span><?= date('Y-m-d H:i:s', $message['timestamp']->toDateTime()->getTimestamp()); ?></span></p>
+                  <p>Timestamp: <span><?=$message['timestamp']; ?></span></p>
                   <p>Replied: <span><?= $replied ? $message['reply_text'] : 'Not yet replied'; ?></span></p>
                   <?php if (!$replied): ?>
                      <form action="" method="post">
