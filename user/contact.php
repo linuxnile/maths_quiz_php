@@ -37,7 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $mongoClient = new MongoDB\Client("mongodb://localhost:27017");
     $database = $mongoClient->mathsquiz;
-    $collection = $database->messages;
+    $collection = $database->feedback;
 
     $messageData = [
         //'user_id' => $user_id,
