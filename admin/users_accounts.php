@@ -43,7 +43,7 @@ if (!isset($admin_id)) {
                 <th>User ID</th>
                 <th>Username</th>
                 <th>Email</th>
-                <th>Standard</th>
+                <th>Age</th>
                 <th>Address</th>
                 <th>Mobile No</th>
                 <th>Sec_question</th>
@@ -62,7 +62,7 @@ if (!isset($admin_id)) {
                     <td><?= $user['_id']; ?></td>
                     <td><?= $user['name']; ?></td>
                     <td><?= $user['email']; ?></td>
-                    <td><?= $user['standard']; ?></td>
+                    <td><?= $user['age']; ?></td>
                     <td><?= $user['address_line'] . ', ' . $user['city']; ?></td>
                     <td><?= $user['mobile_number']; ?></td>
                     <td><?= $user['security_question']; ?></td>
