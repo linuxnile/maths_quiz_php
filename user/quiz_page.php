@@ -43,11 +43,17 @@ if (isset($_SESSION["signedin"]) == true) {
                 }
             }
 
+            date_default_timezone_set('Asia/Kolkata');
+            $listTimestamp = time();
+            $date = date('d-m-Y H:i:s', $listTimestamp);
+
+            $score = $_SESSION['score'] . '/' . $totalQuestions;
+
             $scoreData = [
                 'email' => $_SESSION['email'],
                 'quiz_level' => $quizLevel,
-                'score' => $_SESSION['score'],
-                'date' => new MongoDB\BSON\UTCDateTime()
+                'score' => $score,
+                'date' => $date
             ];
 
             $collection_score = $database->scores;

@@ -37,11 +37,11 @@ body {
   background-color: #68c968;
 }
 
-.level-medium {
+.level-normal {
   background-color: #ffdb58;
 }
 
-.level-medium:hover {
+.level-normal:hover {
   background-color: #e6c300;
 }
 
