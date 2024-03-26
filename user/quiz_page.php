@@ -24,6 +24,12 @@ if (isset($_SESSION["signedin"]) == true) {
     $questions = $collection->find(['category' => $quizLevel])->toArray();
     $totalQuestions = count($questions);
 
+    if ($totalQuestions == 0) {
+        $_SESSION['message'] = 'No questions available for this quiz level. Please try again later.';
+        header('Location: results_page.php');
+        exit();
+    }
+
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (isset($_POST['next'])) {
             // Save answer and increment current question
