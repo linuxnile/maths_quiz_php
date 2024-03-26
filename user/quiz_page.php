@@ -25,9 +25,11 @@ if (isset($_SESSION["signedin"]) == true) {
     $totalQuestions = count($questions);
 
     if ($totalQuestions == 0) {
-        $_SESSION['message'] = 'No questions available for this quiz category. Please try again later.';
-        header('Location: results_page.php');
-        exit();
+        echo
+        '<script>
+            alert("No questions available for this quiz category. Please try again later.");
+            window.location.href = "playquiz.php";
+        </script>';
     }
 
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
