@@ -15,7 +15,7 @@ if (isset($_SESSION["signedin"]) == true) {
 
     if ($user) {
         $userName = $user->name;
-        $standard = $user->standard;
+        $age = $user->age;
         $address_line = $user->address_line;
         $city = $user->city;
         $mobile_number = $user->mobile_number;
@@ -44,15 +44,8 @@ if (isset($_SESSION["signedin"]) == true) {
                     <br />
 
                     <label>
-                        Standard:
-                        <select name="std" required>
-                            <option value="">Select standard</option>
-                            <option value="1" <?php if ($standard == '1') echo 'selected'; ?>>Standard 1</option>
-                            <option value="2" <?php if ($standard == '2') echo 'selected'; ?>>Standard 2</option>
-                            <option value="3" <?php if ($standard == '3') echo 'selected'; ?>>Standard 3</option>
-                            <option value="4" <?php if ($standard == '4') echo 'selected'; ?>>Standard 4</option>
-                            <option value="5" <?php if ($standard == '5') echo 'selected'; ?>>Standard 5</option>
-                        </select>
+                        Age:
+                        <input type="number" name="age" required value="<?php echo $age; ?>">
                     </label>
                     <br />
 
@@ -105,7 +98,7 @@ if (isset($_SESSION["signedin"]) == true) {
 <?php
     if (isset($_POST['update'])) {
         $userName = $_POST['name'];
-        $standard = $_POST['std'];
+        $age = $_POST['age'];
         $address_line = $_POST['add_line'];
         $city = $_POST['city'];
         $mobile_number = $_POST['mobileNo'];
@@ -117,7 +110,7 @@ if (isset($_SESSION["signedin"]) == true) {
             [
                 '$set' => [
                     "name" => $userName,
-                    "standard" => $standard,
+                    "age" => $age,
                     "address_line" => $address_line,
                     "city" => $city,
                     "mobile_number" => $mobile_number,

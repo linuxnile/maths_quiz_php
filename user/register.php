@@ -11,7 +11,7 @@ if (isset($_SESSION["signedin"]) == true) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST['name'];
     $email = $_POST['email'];
-    $standard = $_POST['std'];
+    $age = $_POST['age'];
     $address_line = $_POST['add_line'];
     $city = $_POST['city'];
     $mobile_number = $_POST['mobileNo'];
@@ -27,7 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         [
             'name' => $name,
             'email' => $email,
-            'standard' => $standard,
+            'age' => $age,
             'address_line' => $address_line,
             'city' => $city,
             'mobile_number' => $mobile_number,
@@ -74,15 +74,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 <br />
                 <label>
-                    Standard:
-                    <select name="std" required>
-                        <option value="">Select standard</option>
-                        <option value="1">Standard 1</option>
-                        <option value="2">Standard 2</option>
-                        <option value="3">Standard 3</option>
-                        <option value="4">Standard 4</option>
-                        <option value="5">Standard 5</option>
-                    </select>
+                    Age:
+                    <input type="number" name="age" required placeholder="Enter your age">
                 </label>
                 <br />
 
