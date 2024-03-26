@@ -1,6 +1,12 @@
 <?php
 session_name("user");
 session_start();
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $_SESSION['quiz_level'] = $_POST['level'];
+    header('Location: quiz_page.php');
+    exit();
+}
 ?>
 
 <html>
@@ -16,12 +22,14 @@ session_start();
     <div class="quiz-container">
         <h1>Welcome to the Quiz</h1>
         <p>Test your knowledge by selecting a quiz level below:</p>
-        <div class="button-container">
-            <button class="btn level-easy">Easy</button>
-            <button class="btn level-medium">Medium</button>
-            <button class="btn level-hard">Hard</button>
-            <button class="btn level-expert">Expert</button>
-        </div>
+        <form action="" method="post">
+            <div class="button-container">
+                <button type="submit" name="level" value="easy" class="btn level-easy">Easy</button>
+                <button type="submit" name="level" value="normal" class="btn level-normal">Normal</button>
+                <button type="submit" name="level" value="hard" class="btn level-hard">Hard</button>
+                <button type="submit" name="level" value="expert" class="btn level-expert">Expert</button>
+            </div>
+        </form>
         <p>Choose your challenge wisely and enjoy!</p>
         <div class="quiz-info">
             <h2>How to Play:</h2>
