@@ -20,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $security_answer = $_POST['secAns'];
     date_default_timezone_set('Asia/Kolkata');
     $listTimestamp = time();
-    $registration_date = date('Y-m-d H:i:s', $listTimestamp);
+    $registration_date = date('d-m-Y H:i:s', $listTimestamp);
 
     $mongoClient = new MongoDB\Client("mongodb://localhost:27017");
     $database = $mongoClient->mathsquiz;

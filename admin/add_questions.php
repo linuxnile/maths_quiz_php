@@ -55,22 +55,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     <form action="" method="post">
     <h3>Insert a new MCQ Question</h3><br>
-        <!-- <label for="question">Question:</label><br> -->
         <input type="text" id="question" name="question" placeholder="Enter question" class="box" required><br>
-
-        <!-- <label for="optionA">Option A:</label><br> -->
         <input type="text" id="optionA" name="optionA" placeholder="Option A" class="box" required><br>
-
-        <!-- <label for="optionB">Option B:</label><br> -->
         <input type="text" id="optionB" name="optionB" placeholder="Option B" class="box" required><br>
-
-        <!-- <label for="optionC">Option C:</label><br> -->
         <input type="text" id="optionC" name="optionC" placeholder="Option C" class="box" required><br>
-
-        <!-- <label for="optionD">Option D:</label><br> -->
         <input type="text" id="optionD" name="optionD" placeholder="Option D" class="box" required><br>
-
-        <!-- <label for="answer">Correct Answer:</label><br> -->
         <select id="answer" name="answer" class="box" required>
             <option value="" disabled selected>--Select Correct Answer --</option>
             <option value="A">Option A</option>
@@ -87,6 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </select><br>
 
         <input type="submit" value="Insert Question" class="btn">
+        <a href="manage_quiz.php" class="option-btn">Go Back</a><br><br>
     </form>
     </section>
     <script src="js/admin_script.js"></script>
