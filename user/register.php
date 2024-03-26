@@ -18,6 +18,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
     $security_question = $_POST['secQts'];
     $security_answer = $_POST['secAns'];
+    date_default_timezone_set('Asia/Kolkata');
+    $listTimestamp = time();
+    $registration_date = date('Y-m-d H:i:s', $listTimestamp);
 
     $mongoClient = new MongoDB\Client("mongodb://localhost:27017");
     $database = $mongoClient->mathsquiz;
@@ -33,7 +36,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             'mobile_number' => $mobile_number,
             'password' => $password,
             'security_question' => $security_question,
-            'security_answer' => $security_answer
+            'security_answer' => $security_answer,
+            'registration_date' => $registration_date
         ]
     );
 
