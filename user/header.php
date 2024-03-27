@@ -18,6 +18,7 @@
         <a href="playquiz.php">Play Quiz</a>
         <a href="contact.php">Contact Us</a>
         <?php if (isset($_SESSION['signedin'])) : ?>
+            <a href="scores.php">View Scores</a>
             <a href="userprofile.php"><img class="user-icon" src="assets/user-regular.png" alt="user-icon"> <?php echo $_SESSION['userName']; ?></a>
             <a href="logout.php">Logout</a>
         <?php else : ?>
