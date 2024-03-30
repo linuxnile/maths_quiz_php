@@ -38,8 +38,8 @@ if(!isset($admin_id)){
          <a href="user_report.php" class="option-btn">User Report</a><br><br>
          <p>Total Questions Report</p>
          <a href="question_report.php" class="option-btn">Questions Report</a><br><br>
-         <p>Score Report</p>
-         <a href="score_report.php" class="option-btn">Score Report</a>
+         <!-- <p>Score Report</p>
+         <a href="score_report.php" class="option-btn">Score Report</a> -->
       </div>
    </div>
 </section>
