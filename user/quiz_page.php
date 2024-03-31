@@ -14,14 +14,18 @@ if (isset($_SESSION["signedin"]) == true) {
         exit();
     }
 
+    $category = $_SESSION['category'];
+    $questions = $collection->find(['category' => $category])->toArray();
+
+    shuffle($questions);
+    $questions = array_slice($questions, 0, 10);
+
     if (!isset($_SESSION['current_question'])) {
         $_SESSION['current_question'] = 0;
         $_SESSION['score'] = 0;
         $_SESSION['answers'] = [];
     }
 
-    $category = $_SESSION['category'];
-    $questions = $collection->find(['category' => $category])->toArray();
     $totalQuestions = count($questions);
 
     if ($totalQuestions == 0) {
