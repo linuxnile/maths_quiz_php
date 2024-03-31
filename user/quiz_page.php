@@ -84,16 +84,6 @@ if (isset($_SESSION["signedin"]) == true) {
     <head>
         <title>Quiz Page</title>
         <link rel="stylesheet" href="css/quiz_page.css">
-        <script>
-            function highlightOption(option) {
-                var options = document.querySelectorAll('.options label');
-                options.forEach(function(opt) {
-                    opt.style.backgroundColor = '#f9f9f9';
-                });
-
-                option.parentElement.style.backgroundColor = 'lightgreen';
-            }
-        </script>
     </head>
 
     <body>
@@ -122,6 +112,24 @@ if (isset($_SESSION["signedin"]) == true) {
                 <?php endif; ?>
             </form>
         </div>
+        <script>
+            window.onload = function() {
+                var selectedOption = "<?php echo isset($_SESSION['answers'][$_SESSION['current_question']]) ? $_SESSION['answers'][$_SESSION['current_question']] : ''; ?>";
+                if (selectedOption !== '') {
+                    var optionToHighlight = document.querySelector('input[value="' + selectedOption + '"]');
+                    highlightOption(optionToHighlight);
+                }
+            };
+
+            function highlightOption(option) {
+                var options = document.querySelectorAll('.options label');
+                options.forEach(function(opt) {
+                    opt.style.backgroundColor = '#f9f9f9';
+                });
+
+                option.parentElement.style.backgroundColor = 'lightgreen';
+            }
+        </script>
     </body>
 
     </html>
