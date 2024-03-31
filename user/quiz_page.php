@@ -34,17 +34,15 @@ if (isset($_SESSION["signedin"]) == true) {
 
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (isset($_POST['next'])) {
-            // Save answer and increment current question
-            $_SESSION['answers'][$_SESSION['current_question']] = $_POST['answer'];
+            if (isset($_POST['answer'])) {
+                $_SESSION['answers'][$_SESSION['current_question']] = $_POST['answer'];
+            }
             $_SESSION['current_question']++;
         } elseif (isset($_POST['prev'])) {
-            // Decrement current question
             $_SESSION['current_question']--;
         } elseif (isset($_POST['submit'])) {
-            // Save last answer
             $_SESSION['answers'][$_SESSION['current_question']] = $_POST['answer'];
 
-            // Calculate score
             foreach ($_SESSION['answers'] as $index => $answer) {
                 if ($questions[$index]['answer'] == $answer) {
                     $_SESSION['score']++;
@@ -108,7 +106,7 @@ if (isset($_SESSION["signedin"]) == true) {
                     <div class="options">
                         <?php foreach ($currentQuestion['options'] as $key => $value) : ?>
                             <label>
-                                <input required type="radio" name="answer" value="<?php echo $key; ?>" onclick="highlightOption(this);" <?php echo (isset($_SESSION['answers'][$_SESSION['current_question']]) && $_SESSION['answers'][$_SESSION['current_question']] == $key) ? 'checked' : ''; ?>>
+                                <input type="radio" name="answer" value="<?php echo $key; ?>" onclick="highlightOption(this);" <?php echo (isset($_SESSION['answers'][$_SESSION['current_question']]) && $_SESSION['answers'][$_SESSION['current_question']] == $key) ? 'checked' : ''; ?>>
                                 <?php echo $key . '. ' . $value; ?>
                             </label>
                         <?php endforeach; ?>
