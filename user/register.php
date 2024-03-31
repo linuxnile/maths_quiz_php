@@ -1,7 +1,9 @@
 <?php
 require '../vendor/autoload.php';
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+
 session_name("user");
 session_start();
 
@@ -155,6 +157,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <button type="submit">Register</button>
         </form>
     </div>
+    <?php include('footer.php'); ?>
 </body>
 
 </html>

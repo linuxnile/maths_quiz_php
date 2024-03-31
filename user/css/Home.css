@@ -3,6 +3,10 @@ body {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+}
+
+.main-heading,
+.main-para {
   color: #fff;
 }
 

@@ -41,6 +41,7 @@ if (isset($_SESSION["signedin"]) == true) {
                 <a href="index.php" class="btn">Exit</a>
             </div>
         </div>
+        <?php include('footer.php'); ?>
     </body>
 
     </html>

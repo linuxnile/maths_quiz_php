@@ -71,7 +71,7 @@ if (isset($_SESSION["signedin"]) == true) {
                 <input type="submit" value="Change Password">
             </form>
         </div>
-
+        <?php include('footer.php'); ?>
     </body>
 
     </html>

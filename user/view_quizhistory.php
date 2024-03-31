@@ -46,7 +46,7 @@ if (!$score) {
         <p><strong>Score : </strong><?= $score['score'] ?></p>
         <p><strong>Date : </strong><?= $score['date'] ?></p>
         <div>
-        <h2>Quiz Question History</h2>
+            <h2>Quiz Question History</h2>
             <table border="1">
                 <tr>
                     <th>Question</th>
@@ -71,6 +71,7 @@ if (!$score) {
             </table>
         </div>
     </div>
+    <?php include('footer.php'); ?>
 </body>
 
 </html>

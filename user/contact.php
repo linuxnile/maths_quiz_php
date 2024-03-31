@@ -21,11 +21,12 @@ if (isset($_SESSION["signedin"]) == true) {
     if ($user) {
         $userName = $user->name;
         $userEmail = $user->email;
-    }} else {
-        $userName = '';
-        $userEmail = '';
-    } 
-    
+    }
+} else {
+    $userName = '';
+    $userEmail = '';
+}
+
 //$user_id = $_SESSION['user_id'] ?? '';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST['name'];
@@ -97,25 +98,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <form action="" method="post">
             <label for="name">Name</label>
-            <?php if ($userName): ?>
+            <?php if ($userName) : ?>
                 <input type="text" id="name" name="name" value="<?= $userName ?>" readonly>
-            <?php else: ?>
+            <?php else : ?>
                 <input type="text" id="name" name="name" required placeholder="Enter your name">
             <?php endif; ?>
 
             <label for="email">Email</label>
-            <?php if ($userEmail): ?>
+            <?php if ($userEmail) : ?>
                 <input type="email" id="email" name="email" value="<?= $userEmail ?>" readonly>
-            <?php else: ?>
+            <?php else : ?>
                 <input type="email" id="email" name="email" required placeholder="Enter your email">
             <?php endif; ?>
-            
+
             <label for="message">Message</label>
             <textarea id="message" name="msg" rows="4" required placeholder="Write your message"></textarea>
 
             <button type="submit">Send Message</button>
         </form>
     </div>
+
+    <?php include('footer.php'); ?>
 </body>
 
 </html>

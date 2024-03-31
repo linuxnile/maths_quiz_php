@@ -44,6 +44,7 @@ if (isset($_SESSION["signedin"]) == true) {
                 ?>
             </table>
         </div>
+        <?php include('footer.php'); ?>
     </body>
 
     </html>

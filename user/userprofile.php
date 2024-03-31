@@ -92,6 +92,7 @@ if (isset($_SESSION["signedin"]) == true) {
                 <button type="submit" name="update">Update</button>
             </form>
         </div>
+        <?php include('footer.php'); ?>
     </body>
 
     </html>

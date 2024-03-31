@@ -143,6 +143,7 @@ if (isset($_SESSION["signedin"]) == true) {
                 option.parentElement.style.backgroundColor = 'lightgreen';
             }
         </script>
+        <?php include('footer.php'); ?>
     </body>
 
     </html>
