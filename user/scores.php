@@ -28,6 +28,7 @@ if (isset($_SESSION["signedin"]) == true) {
                     <th>Category</th>
                     <th>Score</th>
                     <th>Date</th>
+                    <th>Action</th>
                 </tr>
                 <?php
 
@@ -37,6 +38,7 @@ if (isset($_SESSION["signedin"]) == true) {
                     echo "<td>" . $document['category'] . "</td>";
                     echo "<td>" . $document['score'] . "</td>";
                     echo "<td>" . $document['date'] . "</td>";
+                    echo "<td><a href='view_quizhistory.php?score_id=" . $document['_id'] . "'><button type='submit'>View</button></a></td>";
                     echo "</tr>";
                 }
                 ?>

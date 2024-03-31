@@ -18,12 +18,13 @@ if (isset($_SESSION["signedin"]) == true) {
     $questions = $collection->find(['category' => $category])->toArray();
 
     shuffle($questions);
-    $questions = array_slice($questions, 0, 10);
+    $questions = array_slice($questions, 0, 5);
 
     if (!isset($_SESSION['current_question'])) {
         $_SESSION['current_question'] = 0;
         $_SESSION['score'] = 0;
         $_SESSION['answers'] = [];
+        $_SESSION['all_questions'] = serialize($questions); // Serialize questions array
     }
 
     $totalQuestions = count($questions);
@@ -47,8 +48,11 @@ if (isset($_SESSION["signedin"]) == true) {
         } elseif (isset($_POST['submit'])) {
             $_SESSION['answers'][$_SESSION['current_question']] = $_POST['answer'];
 
+            // Calculate score
+            $_SESSION['score'] = 0;
+            $questions = unserialize($_SESSION['all_questions']); // Unserialize questions array
             foreach ($_SESSION['answers'] as $index => $answer) {
-                if ($questions[$index]['answer'] == $answer) {
+                if ($questions[$index]->answer == $answer) { // Access object properties using -> notation
                     $_SESSION['score']++;
                 }
             }
@@ -62,9 +66,12 @@ if (isset($_SESSION["signedin"]) == true) {
 
             $scoreData = [
                 'email' => $_SESSION['email'],
+                'name' => $_SESSION["userName"],
                 'category' => $category,
                 'score' => $score,
-                'date' => $date
+                'date' => $date,
+                'answers' => $_SESSION['answers'],
+                'questions' => $questions // Store questions array
             ];
 
             $collection_score = $database->scores;
@@ -80,7 +87,9 @@ if (isset($_SESSION["signedin"]) == true) {
             header('Location: results_page.php');
         }
     }
-    $currentQuestion = $questions[$_SESSION['current_question']];
+    $questions = unserialize($_SESSION['all_questions']); // Unserialize questions array
+    $currentQuestion = $questions[$_SESSION['current_question']]; // Access object by index
+
 ?>
 
     <html>
@@ -96,9 +105,9 @@ if (isset($_SESSION["signedin"]) == true) {
             <h1>Quiz: <?php echo ucfirst($category); ?> Category</h1>
             <form action="" method="post">
                 <div class="question">
-                    <h2><?php echo $currentQuestion['question']; ?></h2>
+                    <h2><?php echo $currentQuestion->question; ?></h2> <!-- Access object properties using -> notation -->
                     <div class="options">
-                        <?php foreach ($currentQuestion['options'] as $key => $value) : ?>
+                        <?php foreach ($currentQuestion->options as $key => $value) : ?> <!-- Access object properties using -> notation -->
                             <label>
                                 <input type="radio" name="answer" value="<?php echo $key; ?>" onclick="highlightOption(this);" <?php echo (isset($_SESSION['answers'][$_SESSION['current_question']]) && $_SESSION['answers'][$_SESSION['current_question']] == $key) ? 'checked' : ''; ?>>
                                 <?php echo $key . '. ' . $value; ?>
