@@ -15,7 +15,7 @@ if (isset($_SESSION["signedin"]) == true) {
     unset($_SESSION['current_question']);
     unset($_SESSION['score']);
     unset($_SESSION['answers']);
-    unset($_SESSION['quiz_level']);
+    unset($_SESSION['category']);
     unset($_SESSION['totalQuestions']);
 ?>
 

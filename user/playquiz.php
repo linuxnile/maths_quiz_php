@@ -17,7 +17,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 
 <body>
-    <?php include('header.php'); ?>
+    <?php include('header.php');
+    unset($_SESSION['current_question']);
+    unset($_SESSION['score']);
+    unset($_SESSION['answers']);
+    unset($_SESSION['category']);
+    unset($_SESSION['totalQuestions']);
+    ?>
 
     <div class="quiz-container">
         <h1>Welcome to the Quiz</h1>
