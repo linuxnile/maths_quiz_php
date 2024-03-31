@@ -36,6 +36,7 @@ p {
   color: #fff;
   text-align: center;
   padding: 10px;
+  position: sticky;
 }
 
 .nav a {
