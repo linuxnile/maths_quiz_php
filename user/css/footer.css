@@ -13,3 +13,7 @@ footer {
   max-width: 960px;
   margin: 0 auto;
 }
+
+.footer-spacer {
+  height: 60px;
+}
